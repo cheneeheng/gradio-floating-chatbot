@@ -1,5 +1,8 @@
 {
     "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "/workspace:/workspace/src"
+    },
     "diffEditor.renderSideBySide": true,
     "editor.rulers": [
         80
