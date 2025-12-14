@@ -1,172 +1,127 @@
+__all__ = [
+    "add_floating_chatbot",
+    "sample_chatbot_response",
+    "default_css",
+]
+
+from typing import Callable
+
 import gradio as gr
-import pandas as pd
 
 
-with gr.Blocks(
-    css="""
-.container {
-  position: relative; /* parent must be relative */
-}
+def add_floating_chatbot(
+    anchor_factory: Callable[[], gr.Component],
+    response_fn: Callable[[list[gr.ChatMessage], str], tuple[list, str]],
+    container_class: str,
+    float_btn_class: str,
+    panel_class: str,
+    panel_header_row_class: str,
+    panel_title_class: str,
+    panel_close_btn_class: str,
+    panel_chat_class: str,
+    panel_msg_txt_class: str,
+    title: str = "Chatbot",
+    icon: str = "💬",
+    min_height: str = "180px",
+    max_height: str = "50vh",
+) -> tuple[
+    gr.Component, gr.Button, gr.Column, gr.Chatbot, gr.Textbox, gr.Button
+]:
+    """
+    Create a floating chatbot panel attached to an anchor component.
 
-.float-btn {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  z-index: 20001;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  font-size: 14px;
-  line-height: 1;
-  border-radius: 50%;
-}
+    This helper wraps any Gradio component (Textbox, Dataframe, Image, etc.)
+    inside a container with a floating action button. Clicking the button
+    reveals a themed panel containing a chatbot interface and a message input.
+    The panel includes a header row with a static title and a close button.
 
-.floating-panel {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  z-index: 20002;
-  width: calc(50% - 12px);
-  min-width: 200px;  /* never smaller than 200px */
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
+    Args:
+        anchor_factory: Callable that builds and returns the anchor component
+            (e.g. lambda: gr.Textbox(...)).
+        response_fn: Function that handles chatbot responses. It must accept
+            (history, message) and return (updated_history, cleared_message).
+        container_class: CSS class applied to the parent container. Should set
+            `position: relative` so the floating panel/button can be positioned.
+        float_btn_class: CSS class applied to the floating button.
+        panel_class: CSS class applied to the floating panel container.
+        panel_header_row_class: CSS class applied to the header row of the panel.
+        panel_title_class: CSS class applied to the title element inside the header.
+        panel_close_btn_class: CSS class applied to the close button inside the header.
+        panel_chat_class: CSS class applied to the Chatbot component inside the panel.
+        panel_msg_txt_class: CSS class applied to the Textbox message input inside the panel.
+        title: Text shown as the panel title. Defaults to "Chatbot".
+        icon: Emoji/text used for the floating action button. Defaults to "💬".
+        min_height: Minimum height for the chatbot component. Defaults to "180px".
+        max_height: Maximum height for the chatbot component. Defaults to "50vh".
 
-#special-group {
-  overflow: visible !important;
-}
+    Returns:
+        tuple containing:
+            - anchor: the anchor component created by anchor_factory
+            - float_btn: the floating action button
+            - panel: the floating panel container
+            - chat: the Chatbot component inside the panel
+            - msg: the Textbox used for message input
+            - close_btn: the close button in the panel header
 
-#special-group .styler {
-  overflow: visible !important;
-}
+    Side Effects:
+        - Wires up toggle logic: clicking the floating button shows the panel,
+          clicking the close button hides it.
+        - Connects the message input to the provided response_fn so that
+          submitted messages update the chatbot history.
+    """
+    # Layout ------------------------------------------------------------------
+    with gr.Column(elem_classes=container_class):
+        anchor = anchor_factory()
+        float_btn = gr.Button(
+            icon,
+            elem_classes=float_btn_class,
+            min_width=1,
+        )
 
-
-"""
-) as demo:
-    gr.Textbox(lines=50, label="Textbox 0")
-    with gr.Row():
-        # First textbox + floating button + floating panel
-        with gr.Column(elem_classes="container"):
-            txt1 = gr.Textbox(lines=10, label="Textbox 1")
-            float_btn1 = gr.Button("⚡", elem_classes="float-btn", min_width=1)
-            with gr.Column(
-                visible=False, elem_classes="floating-panel"
-            ) as panel1:
-                gr.Markdown("### Chatbot 1")
-                chat1 = gr.Chatbot(
-                    type="messages",
-                    height=None,
-                    min_height="180px",
-                    max_height="50vh",
+        with gr.Column(visible=False, elem_classes=panel_class) as panel:
+            with gr.Row(elem_classes=panel_header_row_class):
+                gr.HTML(f"<div class='{panel_title_class}'>{title}</div>")
+                close_btn = gr.Button(
+                    "❌",
+                    min_width=1,
+                    elem_classes=panel_close_btn_class,
                 )
-                msg1 = gr.Textbox(
-                    placeholder="Type a message...", submit_btn=True
-                )
-                close_btn1 = gr.Button("Close")
-
-        with gr.Column(elem_classes="container"):
-            with gr.Group(elem_id="special-group"):
-                with gr.Row():
-                    with gr.Column(elem_classes="container"):
-                        # Second textbox + floating button + floating panel
-                        txt2 = gr.Textbox(lines=10, label="Textbox 2")
-                        float_btn2 = gr.Button(
-                            "💬", elem_classes="float-btn", min_width=1
-                        )
-                        with gr.Column(
-                            visible=False, elem_classes="floating-panel"
-                        ) as panel2:
-                            gr.Markdown("### Chatbot 2")
-                            chat2 = gr.Chatbot(
-                                type="messages",
-                                height=None,
-                                min_height="180px",
-                                max_height="50vh",
-                            )
-                            msg2 = gr.Textbox(
-                                placeholder="Type a message...",
-                                submit_btn=True,
-                            )
-                            close_btn2 = gr.Button("Close")
-
-                with gr.Row():
-                    with gr.Column(elem_classes="container"):
-                        # Third textbox + floating button
-                        txt3 = gr.Textbox(lines=10, label="Textbox 3")
-                        float_btn3 = gr.Button(
-                            "❄️", elem_classes="float-btn", min_width=1
-                        )
-                        with gr.Column(
-                            visible=False, elem_classes="floating-panel"
-                        ) as panel3:
-                            gr.Markdown("### Chatbot 3")
-                            chat3 = gr.Chatbot(
-                                type="messages",
-                                height=None,
-                                min_height="180px",
-                                max_height="50vh",
-                            )
-                            msg3 = gr.Textbox(
-                                placeholder="Type a message...",
-                                submit_btn=True,
-                            )
-                            close_btn3 = gr.Button("Close")
-
-            # DataFrame + floating button
-            df = gr.Dataframe(
-                pd.DataFrame({"id": list(range(10)), "desc": ["apple"] * 10}),
-                label="DataFrame",
+            chat = gr.Chatbot(
+                type="messages",
+                height=None,
+                min_height=min_height,
+                max_height=max_height,
+                show_label=False,
+                elem_classes=panel_chat_class,
             )
-            float_btn4 = gr.Button("⭐", elem_classes="float-btn", min_width=1)
-            with gr.Column(
-                visible=False, elem_classes="floating-panel"
-            ) as panel4:
-                gr.Markdown("### Chatbot 4")
-                chat4 = gr.Chatbot(
-                    type="messages",
-                    height=None,
-                    min_height="180px",
-                    max_height="50vh",
-                )
-                msg4 = gr.Textbox(
-                    placeholder="Type a message...", submit_btn=True
-                )
-                close_btn4 = gr.Button("Close")
+            msg = gr.Textbox(
+                placeholder="Type a message...",
+                submit_btn=True,
+                show_label=False,
+                elem_classes=panel_msg_txt_class,
+            )
 
-    # toggle logic
+    # toggle logic ------------------------------------------------------------
     def show_panel():
         return gr.update(visible=True)
 
     def hide_panel():
         return gr.update(visible=False)
 
-    float_btn1.click(show_panel, None, panel1)
-    close_btn1.click(hide_panel, None, panel1)
+    float_btn.click(fn=show_panel, inputs=None, outputs=panel)
+    close_btn.click(fn=hide_panel, inputs=None, outputs=panel)
 
-    float_btn2.click(show_panel, None, panel2)
-    close_btn2.click(hide_panel, None, panel2)
+    # simple chatbot response -------------------------------------------------
+    msg.submit(response_fn, [chat, msg], [chat, msg])
 
-    float_btn3.click(show_panel, None, panel3)
-    close_btn3.click(hide_panel, None, panel3)
+    return anchor, float_btn, panel, chat, msg, close_btn
 
-    float_btn4.click(show_panel, None, panel4)
-    close_btn4.click(hide_panel, None, panel4)
 
-    # simple chatbot response function
-    def respond(history, message):
-        history = history + [
-            gr.ChatMessage(role="user", content=f"{message}"),
-            gr.ChatMessage(role="assistant", content=f"Echo: {message}"),
-        ]
-        return history, ""
-
-    # wire up each chatbot
-    msg1.submit(respond, [chat1, msg1], [chat1, msg1])
-    msg2.submit(respond, [chat2, msg2], [chat2, msg2])
-    msg3.submit(respond, [chat3, msg3], [chat3, msg3])
-    msg4.submit(respond, [chat4, msg4], [chat4, msg4])
-
-demo.launch()
+def sample_chatbot_response(
+    history: list[gr.ChatMessage], message: str
+) -> tuple[list[gr.ChatMessage], str]:
+    history = history + [
+        gr.ChatMessage(role="user", content=f"{message}"),
+        gr.ChatMessage(role="assistant", content=f"Echo: {message}"),
+    ]
+    return history, ""
