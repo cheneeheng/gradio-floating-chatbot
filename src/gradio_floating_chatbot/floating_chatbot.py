@@ -1,9 +1,9 @@
 __all__ = [
     "add_floating_chatbot",
     "sample_chatbot_response",
-    "default_css",
 ]
 
+import uuid
 from typing import Callable
 
 import gradio as gr
@@ -24,6 +24,7 @@ def add_floating_chatbot(
     icon: str = "💬",
     min_height: str = "180px",
     max_height: str = "50vh",
+    panel_id: str | None = None,
 ) -> tuple[
     gr.Component, gr.Button, gr.Column, gr.Chatbot, gr.Textbox, gr.Button
 ]:
@@ -53,6 +54,8 @@ def add_floating_chatbot(
         icon: Emoji/text used for the floating action button. Defaults to "💬".
         min_height: Minimum height for the chatbot component. Defaults to "180px".
         max_height: Maximum height for the chatbot component. Defaults to "50vh".
+        panel_id: Optional explicit element ID for the chatbot panel. If None,
+            a unique UUID-based ID will be generated.
 
     Returns:
         tuple containing:
@@ -70,6 +73,9 @@ def add_floating_chatbot(
           submitted messages update the chatbot history.
     """
     # Layout ------------------------------------------------------------------
+    if panel_id is None:
+        panel_id = f"gfc-{uuid.uuid4().hex}"
+
     with gr.Column(elem_classes=container_class):
         anchor = anchor_factory()
         float_btn = gr.Button(
@@ -78,7 +84,9 @@ def add_floating_chatbot(
             min_width=1,
         )
 
-        with gr.Column(visible=False, elem_classes=panel_class) as panel:
+        with gr.Column(
+            visible=False, elem_classes=panel_class, elem_id=panel_id
+        ) as panel:
             with gr.Row(elem_classes=panel_header_row_class):
                 gr.HTML(f"<div class='{panel_title_class}'>{title}</div>")
                 close_btn = gr.Button(
@@ -101,15 +109,93 @@ def add_floating_chatbot(
                 elem_classes=panel_msg_txt_class,
             )
 
+    # This hidden textbox is used to pass the panel's ID to the JS functions
+    # without creating a circular input/output dependency on the panel itself.
+    panel_id_carrier = gr.Textbox(
+        value=panel_id, visible=False, container=False
+    )
+
     # toggle logic ------------------------------------------------------------
-    def show_panel():
+    def show_panel(_):
         return gr.update(visible=True)
 
-    def hide_panel():
+    def hide_panel(_):
         return gr.update(visible=False)
 
-    float_btn.click(fn=show_panel, inputs=None, outputs=panel)
-    close_btn.click(fn=hide_panel, inputs=None, outputs=panel)
+    # JS for opening the panel and adding the Esc listener
+    js_open_panel = f"""
+(panelId) => {{
+  // Initialize a global stack to track the order of opened panels (LIFO)
+  if (!window.gfcOpenPanelStack) {{
+    window.gfcOpenPanelStack = [];
+  }}
+
+  // Add the panel's ID to the stack if it's not already there
+  if (!window.gfcOpenPanelStack.includes(panelId)) {{
+    window.gfcOpenPanelStack.push(panelId);
+  }}
+
+  // Add the global Esc key listener only once
+  if (!window.gfcEscListenerAttached) {{
+    document.addEventListener("keydown", (e) => {{
+      if (e.key === "Escape" && window.gfcOpenPanelStack.length > 0) {{
+        // Get the ID of the last opened panel without removing it from the stack
+        const lastPanelId = window.gfcOpenPanelStack[window.gfcOpenPanelStack.length - 1];
+        if (lastPanelId) {{
+          const panelToClose = document.getElementById(lastPanelId);
+          if (panelToClose) {{
+            // Find and click the close button within that specific panel
+            const closeButton = panelToClose.querySelector(".{panel_close_btn_class}");
+            if (closeButton) {{
+              closeButton.dispatchEvent(new MouseEvent('click', {{ bubbles: true, cancelable: true, view: window }}));
+              // Blur the active element to prevent focus highlight on the float btn
+              if(document.activeElement) {{
+                document.activeElement.blur();
+              }}
+            }}
+          }}
+        }}
+      }}
+    }});
+    window.gfcEscListenerAttached = true;
+  }}
+
+  // Return the panelId to trigger the Python `show_panel` function
+  return [panelId];
+}}
+"""
+
+    # JS for handling the close button click
+    js_close_panel = """
+(panelId) => {
+  // Ensure the stack exists
+  if (!window.gfcOpenPanelStack) {
+    window.gfcOpenPanelStack = [];
+  }
+
+  // Remove the panel's ID from the stack upon closing
+  const index = window.gfcOpenPanelStack.indexOf(panelId);
+  if (index > -1) {
+    window.gfcOpenPanelStack.splice(index, 1);
+  }
+
+  // Return the panelId to trigger the Python `hide_panel` function
+  return [panelId];
+}
+"""
+
+    float_btn.click(
+        fn=show_panel,
+        inputs=[panel_id_carrier],
+        outputs=[panel],
+        js=js_open_panel,
+    )
+    close_btn.click(
+        fn=hide_panel,
+        inputs=[panel_id_carrier],
+        outputs=[panel],
+        js=js_close_panel,
+    )
 
     # simple chatbot response -------------------------------------------------
     msg.submit(response_fn, [chat, msg], [chat, msg])

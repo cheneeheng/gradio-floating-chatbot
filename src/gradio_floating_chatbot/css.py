@@ -1,3 +1,8 @@
+__all__ = [
+    "default_css",
+    "default_css_class_names",
+]
+
 default_css = """
 .gfc-container {
   position: relative; /* parent must be relative for float btn */
