@@ -101,15 +101,15 @@ min_height: "300px"
 
 ## Configuration Options (`FloatingChatbotConfig`)
 
-| Field           | Type     | Default   | Description                    |
-| --------------- | -------- | --------- | ------------------------------ | ----------------- |
-| `instance_name` | `str`    | UUID      | Unique ID for the instance.    |
-| `title`         | `str`    | "Chatbot" | Title shown in the header.     |
-| `anchor_mode`   | `"local" | "global"` | "local"                        | Positioning mode. |
-| `collapsed`     | `bool`   | `True`    | Initial state.                 |
-| `icon`          | `str`    | "💬"      | Icon for the floating button (text or path). |
-| `icon_type`     | `"text" \| "image"` | "text" | Type of icon (text or image). |
-| `min_height`    | `str`    | "180px"   | Minimum height of chat window. |
+| Field           | Type                  | Default   | Description                                  |
+| --------------- | --------------------- | --------- | -------------------------------------------- |
+| `instance_name` | `str`                 | UUID      | Unique ID for the instance.                  |
+| `title`         | `str`                 | "Chatbot" | Title shown in the header.                   |
+| `anchor_mode`   | `"local" \| "global"` | "local"   | Positioning mode.                            |
+| `collapsed`     | `bool`                | `True`    | Initial state.                               |
+| `icon`          | `str`                 | "💬"      | Icon for the floating button (text or path). |
+| `icon_type`     | `"text" \| "image"`   | "text"    | Type of icon (text or image).                |
+| `min_height`    | `str`                 | "180px"   | Minimum height of chat window.               |
 
 ### Image Icon Example
 

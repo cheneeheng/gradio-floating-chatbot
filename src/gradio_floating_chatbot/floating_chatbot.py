@@ -309,7 +309,7 @@ class FloatingChatbot:
       // Return the panelId to trigger the Python `show_panel` function
       return [panelId];
     }}
-    """
+    """  # noqa: E501
 
         # JS for handling the close button click
         js_close_panel = """
