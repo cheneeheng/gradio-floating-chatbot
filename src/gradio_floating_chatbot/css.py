@@ -5,7 +5,14 @@ __all__ = [
 
 default_css = """
 .gfc-container {
-  position: relative; /* parent must be relative for float btn */
+  position: relative; /* parent must be relative for float btn in local mode */
+}
+
+/* For global anchoring */
+.gfc-fixed {
+  position: fixed !important;
+  /* z-index needs to be high to float above everything */
+  z-index: 99999 !important;
 }
 
 .gfc-float-btn {
