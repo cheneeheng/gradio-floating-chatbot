@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gradio-floating-chatbot"
-version = "0.0.1"
+version = "0.0.2"
 description = "Floating chatbot for gradio"
 authors = [{ name = "ChenEeHeng", email = "eeheng.chen@gmail.com" }]
 readme = "README.md"
