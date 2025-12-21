@@ -9,7 +9,11 @@ description = "Floating chatbot for gradio"
 authors = [{ name = "ChenEeHeng", email = "eeheng.chen@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["gradio>=5.49.1,<6", "pip>=25.2"]
+dependencies = [
+    "gradio>=5.49.1,<6",
+    "pip>=25.2",
+    "pyyaml>=6.0.3",
+]
 
 classifiers = [
     "Programming Language :: Python :: 3",
