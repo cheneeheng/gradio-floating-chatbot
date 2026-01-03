@@ -84,21 +84,9 @@ def test_sample_chatbot_response():
 
 
 def test_toggle_functions():
-    # Test the instance methods
-    bot = FloatingChatbot()
-
-    # Check Show
-    update_show = bot._show_panel(None)
+    # Test the static methods directly
+    update_show = FloatingChatbot._show_panel(None)
     assert update_show["visible"] is True
-    # The default config has 'gfc-panel'
-    assert "gfc-panel" in update_show["elem_classes"]
 
-    # Check Hide
-    update_hide = bot._hide_panel(None)
+    update_hide = FloatingChatbot._hide_panel(None)
     assert update_hide["visible"] is False
-    assert update_hide["elem_classes"] == []
-
-    # Check Global Fixed class logic
-    bot_global = FloatingChatbot(FloatingChatbotConfig(anchor_mode="global"))
-    update_show_global = bot_global._show_panel(None)
-    assert "gfc-fixed" in update_show_global["elem_classes"]

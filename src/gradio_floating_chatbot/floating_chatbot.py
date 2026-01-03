@@ -244,14 +244,13 @@ class FloatingChatbot:
 
         return self.components
 
-    def _show_panel(self, _):
-        pnl_cls = self.config.panel_class or ""
-        if self.config.anchor_mode == "global":
-            pnl_cls += " gfc-fixed"
-        return gr.update(visible=True, elem_classes=pnl_cls)
+    @staticmethod
+    def _show_panel(_):
+        return gr.update(visible=True)
 
-    def _hide_panel(self, _):
-        return gr.update(visible=False, elem_classes=[])
+    @staticmethod
+    def _hide_panel(_):
+        return gr.update(visible=False)
 
     def define_events(
         self,
@@ -279,6 +278,11 @@ class FloatingChatbot:
       // Add the panel's ID to the stack if it's not already there
       if (!window.gfcOpenPanelStack.includes(panelId)) {{
         window.gfcOpenPanelStack.push(panelId);
+      }}
+
+      const panel = document.getElementById(panelId);
+      if (panel) {{
+        panel.style.display = '';
       }}
 
       // Add the global Esc key listener only once
@@ -317,6 +321,11 @@ class FloatingChatbot:
       // Ensure the stack exists
       if (!window.gfcOpenPanelStack) {
         window.gfcOpenPanelStack = [];
+      }
+
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.style.display = 'none';
       }
 
       // Remove the panel's ID from the stack upon closing
