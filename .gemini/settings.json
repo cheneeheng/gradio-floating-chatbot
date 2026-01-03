@@ -1,43 +1,29 @@
 {
-  "general": {
-    "preferredEditor": "code",
-    "enablePromptCompletion": true
-  },
-  "ui": {
-    "hideTips": true,
-    "hideBanner": true,
-    "showMemoryUsage": true,
-    "showLineNumbers": true,
-    "useFullWidth": true
-  },
-  "telemetry": {
-    "enabled": false
-  },
-  "privacy": {
-    "usageStatisticsEnabled": false
-  },
-  "security": {
-    "auth": {
-      "selectedType ": "oauth-personal"
-    }
-  },
   "context": {
     "fileName": [
-      "agent-tasks/AGENTS.md"
+      "agent-tasks/agent/AGENT_CONTRACT.md",
+      "agent-tasks/agent/NON_GOALS.md",
+      "agent-tasks/agent/REPO_STRUCTURE.md",
+      "agent-tasks/agent/DEV_WORKFLOW.md",
+      "agent-tasks/agent/ENVIRONMENT_PY.md",
+      "agent-tasks/agent/DECISION_LOG.md",
+      "agent-tasks/agent/ARCHITECTURE_DECISIONS.md",
+      "agent-tasks/agent/QUALITY_GATES.md",
+      "agent-tasks/agent/TESTING_PY.md",
+      "agent-tasks/agent/CODING_STYLE_PY.md",
+      "agent-tasks/agent/LINTING_PY.md",
+      "agent-tasks/agent/GIT_WORKFLOW.md",
+      "agent-tasks/agent/OBSERVABILITY.md"
     ]
-  },
-  "ide": {
-    "hasSeenNudge": true,
-    "enabled": false
   },
   "mcpServers": {
     "gradio": {
       "url": "https://gradio-docs-mcp.hf.space/gradio_api/mcp/sse"
-    }
-  },
-  "tools": {
-    "shell": {
-      "showColor": true
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"],
+      "timeout": 10000
     }
   }
 }
