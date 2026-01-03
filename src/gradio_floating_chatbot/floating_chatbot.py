@@ -218,7 +218,6 @@ class FloatingChatbot:
                         elem_classes=self.config.panel_close_btn_class,
                     )
                 chat = gr.Chatbot(
-                    type="messages",
                     height=None,
                     min_height=self.config.min_height,
                     max_height=self.config.max_height,
@@ -281,6 +280,11 @@ class FloatingChatbot:
         window.gfcOpenPanelStack.push(panelId);
       }}
 
+      const panel = document.getElementById(panelId);
+      if (panel) {{
+        panel.style.display = '';
+      }}
+
       // Add the global Esc key listener only once
       if (!window.gfcEscListenerAttached) {{
         document.addEventListener("keydown", (e) => {{
@@ -319,6 +323,11 @@ class FloatingChatbot:
         window.gfcOpenPanelStack = [];
       }
 
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.style.display = 'none';
+      }
+
       // Remove the panel's ID from the stack upon closing
       const index = window.gfcOpenPanelStack.indexOf(panelId);
       if (index > -1) {
@@ -341,12 +350,14 @@ class FloatingChatbot:
             inputs=[panel_id_carrier],
             outputs=[panel],
             js=js_open_panel,
+            show_progress="hidden",
         )
         close_btn.click(
             fn=self._hide_panel,
             inputs=[panel_id_carrier],
             outputs=[panel],
             js=js_close_panel,
+            show_progress="hidden",
         )
 
         # simple chatbot response -------------------------------------------------

@@ -11,11 +11,44 @@ from gradio_floating_chatbot import (
 # Custom CSS for the second example
 custom_css = """
 .my-container { position: relative; }
-.my-btn { position: absolute; bottom: 50px; left: 20px; font-size: 24px; }
-.my-panel { position: absolute; bottom: 100px; left: 20px; width: 300px; background: #eee; padding: 10px; border: 2px solid blue; }
-.my-header { display: flex; justify-content: space-between; font-weight: bold; }
+.my-btn {
+  position: absolute;
+  bottom: 50px;
+  left: 20px;
+  z-index: 20001;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 24px;
+}
+.my-panel {
+  position: absolute;
+  bottom: 100px;
+  left: 20px;
+  z-index: 20002;
+  width: 300px;
+  background: #eee;
+  padding: 10px;
+  border: 2px solid blue;
+}
+.my-header {
+  display: flex;
+  justify-content:
+  space-between;
+  font-weight: bold;
+}
 .my-title { color: blue; }
-.my-close { color: red; cursor: pointer; }
+.my-close {
+  flex: 0 0 auto;   /* for right aligning */
+  width: 28px;
+  height: 28px;
+  padding: 0;   /* for centering */
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1;
+  color: red;
+  cursor: pointer;
+}
 .my-chat { height: 200px; overflow-y: auto; background: white; }
 .my-msg { margin-top: 10px; }
 """  # noqa: E501
@@ -23,7 +56,7 @@ custom_css = """
 # Combine default and custom CSS for the demo
 full_css = default_css + "\n" + custom_css
 
-with gr.Blocks(css=full_css) as demo:
+with gr.Blocks() as demo:
     gr.Markdown("# Floating Chatbot Demo")
     gr.Textbox(lines=5, label="Textbox 0")
 
@@ -58,6 +91,7 @@ with gr.Blocks(css=full_css) as demo:
                 panel_close_btn_class="my-close",
                 panel_chat_class="my-chat",
                 panel_msg_txt_class="my-msg",
+                max_height="10vh",
             )
 
             bot2 = FloatingChatbot(custom_config)
@@ -79,4 +113,4 @@ with gr.Blocks(css=full_css) as demo:
     global_bot.create_layout()
     global_bot.define_events(sample_chatbot_response)
 
-demo.launch()
+demo.launch(css=full_css)

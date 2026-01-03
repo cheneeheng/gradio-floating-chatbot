@@ -1,7 +1,5 @@
 tmp*
-
-# commit msg file
-tmp-commit-message.txt
+DECISION_LOG.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

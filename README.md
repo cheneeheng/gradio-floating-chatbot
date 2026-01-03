@@ -17,6 +17,11 @@ A flexible, floating chatbot component for Gradio applications.
   - Persistence support (save/load configs).
 - **Multiple Instances**: Support for multiple independent chatbots on the same page.
 
+## Requirements
+
+- **Python**: >= 3.12
+- **Gradio**: >= 6.2.0
+
 ## Installation
 
 ```bash
@@ -99,6 +104,16 @@ collapsed: true
 min_height: "300px"
 ```
 
+### Image Icon Example
+
+```python
+config = FloatingChatbotConfig(
+    icon="https://example.com/bot-icon.png",
+    icon_type="image"
+)
+bot = FloatingChatbot(config)
+```
+
 ## Configuration Options (`FloatingChatbotConfig`)
 
 | Field           | Type                  | Default   | Description                                  |
@@ -110,13 +125,3 @@ min_height: "300px"
 | `icon`          | `str`                 | "💬"      | Icon for the floating button (text or path). |
 | `icon_type`     | `"text" \| "image"`   | "text"    | Type of icon (text or image).                |
 | `min_height`    | `str`                 | "180px"   | Minimum height of chat window.               |
-
-### Image Icon Example
-
-```python
-config = FloatingChatbotConfig(
-    icon="https://example.com/bot-icon.png",
-    icon_type="image"
-)
-bot = FloatingChatbot(config)
-```

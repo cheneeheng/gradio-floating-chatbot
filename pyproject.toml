@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gradio-floating-chatbot"
-version = "0.0.2"
+version = "0.1.0"
 description = "Floating chatbot for gradio"
 authors = [{ name = "ChenEeHeng", email = "eeheng.chen@gmail.com" }]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
-    "gradio>=5.49.1,<6",
+    "gradio>=6.2.0,<7",
     "pip>=25.2",
     "pyyaml>=6.0.3",
 ]
@@ -40,7 +40,7 @@ addopts = "-ra -q --cov=src --cov-report=term-missing"
 testpaths = ["tests"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py312"
 line-length = 79
 cache-dir = "/tmp/ruff_cache"
 
