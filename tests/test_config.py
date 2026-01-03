@@ -1,4 +1,5 @@
 import pytest
+
 from gradio_floating_chatbot import FloatingChatbot, FloatingChatbotConfig
 
 

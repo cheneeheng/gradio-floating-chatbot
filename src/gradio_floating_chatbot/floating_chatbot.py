@@ -218,7 +218,6 @@ class FloatingChatbot:
                         elem_classes=self.config.panel_close_btn_class,
                     )
                 chat = gr.Chatbot(
-                    type="messages",
                     height=None,
                     min_height=self.config.min_height,
                     max_height=self.config.max_height,

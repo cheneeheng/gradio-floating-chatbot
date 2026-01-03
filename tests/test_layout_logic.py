@@ -1,5 +1,6 @@
 import gradio as gr
 import pytest
+
 from gradio_floating_chatbot import (
     FloatingChatbot,
     FloatingChatbotConfig,
@@ -63,7 +64,7 @@ def test_define_events_wiring():
     # Smoke test to ensure define_events doesn't crash and sets up click handlers
     bot = FloatingChatbot()
     with gr.Blocks():
-        components = bot.create_layout(lambda: gr.Textbox("A"))
+        _ = bot.create_layout(lambda: gr.Textbox("A"))
         bot.define_events(lambda h, m: (h, ""))
 
     assert bot.panel_id is not None
