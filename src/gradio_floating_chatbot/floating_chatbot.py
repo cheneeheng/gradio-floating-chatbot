@@ -244,13 +244,14 @@ class FloatingChatbot:
 
         return self.components
 
-    @staticmethod
-    def _show_panel(_):
-        return gr.update(visible=True)
+    def _show_panel(self, _):
+        pnl_cls = self.config.panel_class or ""
+        if self.config.anchor_mode == "global":
+            pnl_cls += " gfc-fixed"
+        return gr.update(visible=True, elem_classes=pnl_cls)
 
-    @staticmethod
-    def _hide_panel(_):
-        return gr.update(visible=False)
+    def _hide_panel(self, _):
+        return gr.update(visible=False, elem_classes=[])
 
     def define_events(
         self,
@@ -340,12 +341,14 @@ class FloatingChatbot:
             inputs=[panel_id_carrier],
             outputs=[panel],
             js=js_open_panel,
+            show_progress="hidden",
         )
         close_btn.click(
             fn=self._hide_panel,
             inputs=[panel_id_carrier],
             outputs=[panel],
             js=js_close_panel,
+            show_progress="hidden",
         )
 
         # simple chatbot response -------------------------------------------------
